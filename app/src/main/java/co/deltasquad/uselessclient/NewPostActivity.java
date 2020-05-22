@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -29,9 +30,14 @@ public class NewPostActivity extends FragmentActivity {
 	EditText postTitleEdit;
 	EditText postContentEdit;
 
+	TextView titleText;
+	TextView buttonText;
+
 	AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
 
 	SharedPreferences sPref;
+
+	String handle = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,8 @@ public class NewPostActivity extends FragmentActivity {
 
 						JSONObject blog = blog_list.getJSONObject(0);
 
+						handle = blog.getString("author_handle");
+
 						postTitleEdit.setText(blog.getString("title"));
 						postContentEdit.setText(blog.getString("content"));
 
@@ -69,9 +77,20 @@ public class NewPostActivity extends FragmentActivity {
 		backButton = findViewById(R.id.backButton);
 		createPostButton = findViewById(R.id.createPostButton);
 
+		titleText = findViewById(R.id.titleText);
+		buttonText = findViewById(R.id.buttonText);
+
 		postTitleEdit = findViewById(R.id.postTitleEdit);
 		postContentEdit = findViewById(R.id.postContentEdit);
 
+		if(GlobalClass.updatePost){
+			titleText.setText("Edit Post");
+			buttonText.setText("Update Post");
+		}
+		else{
+			titleText.setText("New Post");
+			buttonText.setText("Create Post");
+		}
 
 	}
 
@@ -115,11 +134,11 @@ public class NewPostActivity extends FragmentActivity {
 
 		if(check) {
 
-			AppRequests.getInstance().updateBlog(NewPostActivity.this, postContentEdit.getText().toString(), postTitleEdit.getText().toString(), GlobalClass.selectedBlogSlug, client, new JsonHttpResponseHandler() {
+			AppRequests.getInstance().updateBlog(NewPostActivity.this, postContentEdit.getText().toString(), postTitleEdit.getText().toString(), GlobalClass.selectedBlogSlug, handle, client, new JsonHttpResponseHandler() {
 				@Override
 				public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 					AlertDialog.Builder builder = new AlertDialog.Builder(NewPostActivity.this);
-					builder.setTitle("Success").setMessage("You have successfully created new post").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					builder.setTitle("Success").setMessage("You have successfully edited your post").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							dialog.cancel();

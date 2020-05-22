@@ -104,7 +104,7 @@ public class AppRequests {
     }
 
     public void getBlogsByPartialTitle(String partial_title, AsyncHttpClient client, JsonHttpResponseHandler handler) {
-        String url = "blogs";
+        String url = "blogs/search";
 
         RequestParams params = new RequestParams();
         params.put("title", partial_title);
@@ -124,11 +124,12 @@ public class AppRequests {
                 handler);
     }
 
-    public void updateBlog(Context context, String content, String title, String slug, AsyncHttpClient client, JsonHttpResponseHandler handler) throws UnsupportedEncodingException, JSONException {
+    public void updateBlog(Context context, String content, String title, String slug, String handle, AsyncHttpClient client, JsonHttpResponseHandler handler) throws UnsupportedEncodingException, JSONException {
         String url = "blogs/" + slug;
 
         JSONObject jsonParams = new JSONObject();
         jsonParams.put("title", title);
+        jsonParams.put("author_handle", handle);
         jsonParams.put("content", content);
         StringEntity entity = new StringEntity(jsonParams.toString());
 

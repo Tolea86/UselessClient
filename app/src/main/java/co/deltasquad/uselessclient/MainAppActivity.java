@@ -41,6 +41,8 @@ public class MainAppActivity extends BlogActivity {
 
 	SharedPreferences sPref;
 
+	boolean firstTime = true;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -181,5 +183,16 @@ public class MainAppActivity extends BlogActivity {
 
 		Intent newIntent = new Intent(MainAppActivity.this, NewPostActivity.class);
 		startActivity(newIntent);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if(firstTime){
+			firstTime = false;
+		}
+		else{
+			getBlogs();
+		}
 	}
 }
