@@ -3,6 +3,7 @@ package co.deltasquad.uselessclient;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,7 +31,7 @@ import javax.net.ssl.X509TrustManager;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.conn.ssl.AllowAllHostnameVerifier;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
 
 	EditText handleEdit;
 	EditText passwordEdit;

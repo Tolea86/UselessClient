@@ -1,6 +1,7 @@
 package co.deltasquad.uselessclient;
 
 import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends FragmentActivity {
 
 	RelativeLayout backButton;
 	RelativeLayout registerButton;
@@ -27,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
 	EditText nameEdit;
 	EditText passwordEdit;
 
-	AsyncHttpClient client = new AsyncHttpClient();
+	AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

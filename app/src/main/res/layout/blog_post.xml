@@ -39,6 +39,54 @@
         android:textSize="16dp"
         android:layout_height="wrap_content" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/myPostButtons"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="#000"
+            android:layout_weight="1"
+            android:id="@+id/deleteButton"
+            android:layout_marginEnd="10dp"
+            android:layout_height="30dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete Post"
+                android:textColor="#FFF"
+                android:textSize="16dp"
+                android:layout_centerInParent="true"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="#000"
+            android:layout_weight="1"
+            android:id="@+id/editButton"
+            android:layout_marginStart="10dp"
+            android:layout_height="30dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit Post"
+                android:textColor="#FFF"
+                android:textSize="16dp"
+                android:layout_centerInParent="true"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:background="#000"

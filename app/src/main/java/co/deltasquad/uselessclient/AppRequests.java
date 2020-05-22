@@ -148,6 +148,14 @@ public class AppRequests {
                 handler);
     }
 
+    public void deletePost(String slug, AsyncHttpClient client, JsonHttpResponseHandler handler) {
+        String url = "blogs/" + slug;
+
+        RequestParams params = new RequestParams();
+
+        client.delete(getAbsoluteUrl(url), params, handler);
+    }
+
 
 
 }

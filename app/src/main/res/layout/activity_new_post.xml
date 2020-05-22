@@ -59,24 +59,6 @@
 
         <EditText
             android:layout_width="200dp"
-            android:layout_height="35dp"
-            android:background="@android:color/transparent"
-            android:hint="Post Slug"
-            android:layout_marginTop="15dp"
-            android:textSize="16dp"
-            android:singleLine="true"
-            android:id="@+id/postSlugEdit"
-            android:textColor="#000"
-            />
-
-        <RelativeLayout
-            android:layout_width="200dp"
-            android:background="#000"
-            android:layout_marginTop="5dp"
-            android:layout_height="1dp"/>
-
-        <EditText
-            android:layout_width="200dp"
             android:layout_height="140dp"
             android:background="@android:color/transparent"
             android:hint="Post Content"

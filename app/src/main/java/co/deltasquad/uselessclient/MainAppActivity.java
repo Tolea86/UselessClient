@@ -1,6 +1,10 @@
 package co.deltasquad.uselessclient;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,10 +25,12 @@ import co.deltasquad.uselessclient.Adapters.BlogPostAdapter;
 import co.deltasquad.uselessclient.Objects.BlogPostObject;
 import cz.msebera.android.httpclient.Header;
 
-public class MainAppActivity extends AppCompatActivity {
+public class MainAppActivity extends BlogActivity {
 
 	RelativeLayout myProfileButton;
 	RelativeLayout newPostButton;
+	RelativeLayout searchUserButton;
+	RelativeLayout searchBlogButton;
 
 	List<BlogPostObject> blogPostList = new ArrayList<>();
 
@@ -33,10 +39,16 @@ public class MainAppActivity extends AppCompatActivity {
 
 	AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
 
+	SharedPreferences sPref;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_app);
+
+		sPref = getSharedPreferences("USELESS", MODE_PRIVATE);
+
+		client.addHeader("Authorization", "Bearer " + sPref.getString("token", ""));
 
 		setAllTheViews();
 		setAllTheClickListeners();
@@ -45,9 +57,11 @@ public class MainAppActivity extends AppCompatActivity {
 	private void setAllTheViews(){
 		myProfileButton = findViewById(R.id.myProfileButton);
 		newPostButton = findViewById(R.id.newPostButton);
+		searchUserButton = findViewById(R.id.searchUserButton);
+		searchBlogButton = findViewById(R.id.searchBlogButton);
 
 		postList = findViewById(R.id.postList);
-		adapter = new BlogPostAdapter(this);
+		adapter = new BlogPostAdapter(this, MainAppActivity.this);
 		adapter.setData(blogPostList);
 		postList.setAdapter(adapter);
 
@@ -91,7 +105,18 @@ public class MainAppActivity extends AppCompatActivity {
 		newPostButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+
+				GlobalClass.updatePost = false;
+
 				Intent newIntent = new Intent(MainAppActivity.this, NewPostActivity.class);
+				startActivity(newIntent);
+			}
+		});
+
+		searchBlogButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent newIntent = new Intent(MainAppActivity.this, SearchBlogActivity.class);
 				startActivity(newIntent);
 			}
 		});
@@ -99,8 +124,62 @@ public class MainAppActivity extends AppCompatActivity {
 		myProfileButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//TODO GO TO MY PROFILE BUTTON
+				Intent newIntent = new Intent(MainAppActivity.this, MyProfileActivity.class);
+				startActivity(newIntent);
 			}
 		});
+
+		searchUserButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent newIntent = new Intent(MainAppActivity.this, SearchUserActivity.class);
+				startActivity(newIntent);
+			}
+		});
+	}
+
+	@Override
+	public void authorHandleClicked(String handle) {
+		GlobalClass.selectedUserHandle = handle;
+
+		Intent newIntent = new Intent(MainAppActivity.this, UserProfileActivity.class);
+		startActivity(newIntent);
+	}
+
+	@Override
+	public void deletePostClicked(final String slug) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(MainAppActivity.this);
+		builder.setTitle("Confirmation").setMessage("Are you sure you want to delete selected post?").setNegativeButton("No", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		}).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+
+				AppRequests.getInstance().deletePost(slug, client, new JsonHttpResponseHandler() {
+					@Override
+					public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+						getBlogs();
+					}
+
+					@Override
+					public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+						super.onFailure(statusCode, headers, throwable, errorResponse);
+					}
+				});
+			}
+		}).show();
+	}
+
+	@Override
+	public void editPostClicked(String slug) {
+		GlobalClass.selectedBlogSlug = slug;
+		GlobalClass.updatePost = true;
+
+		Intent newIntent = new Intent(MainAppActivity.this, NewPostActivity.class);
+		startActivity(newIntent);
 	}
 }

@@ -2,6 +2,7 @@ package co.deltasquad.uselessclient;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.RelativeLayout;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 
 import cz.msebera.android.httpclient.Header;
 
-public class NewPostActivity extends AppCompatActivity {
+public class NewPostActivity extends FragmentActivity {
 
 	RelativeLayout backButton;
 	RelativeLayout createPostButton;
@@ -27,7 +29,7 @@ public class NewPostActivity extends AppCompatActivity {
 	EditText postTitleEdit;
 	EditText postContentEdit;
 
-	AsyncHttpClient client = new AsyncHttpClient();
+	AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
 
 	SharedPreferences sPref;
 
@@ -42,6 +44,25 @@ public class NewPostActivity extends AppCompatActivity {
 
 		setAllTheViews();
 		setAllTheClickListeners();
+
+		if(GlobalClass.updatePost) {
+			AppRequests.getInstance().getBlogsBySlug(GlobalClass.selectedBlogSlug, client, new JsonHttpResponseHandler(){
+				@Override
+				public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+					try {
+						JSONArray blog_list = response.getJSONArray("blog_list");
+
+						JSONObject blog = blog_list.getJSONObject(0);
+
+						postTitleEdit.setText(blog.getString("title"));
+						postContentEdit.setText(blog.getString("content"));
+
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
 	}
 
 	private void setAllTheViews(){
@@ -50,6 +71,8 @@ public class NewPostActivity extends AppCompatActivity {
 
 		postTitleEdit = findViewById(R.id.postTitleEdit);
 		postContentEdit = findViewById(R.id.postContentEdit);
+
+
 	}
 
 	private void setAllTheClickListeners(){
@@ -63,15 +86,55 @@ public class NewPostActivity extends AppCompatActivity {
 		createPostButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				try {
-					createNewPost();
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					e.printStackTrace();
+
+				if(GlobalClass.updatePost) {
+					try {
+						updatePost();
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+				else {
+
+					try {
+						createNewPost();
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		});
+	}
+
+	private void updatePost() throws UnsupportedEncodingException, JSONException {
+		boolean check = checkAllFields();
+
+		if(check) {
+
+			AppRequests.getInstance().updateBlog(NewPostActivity.this, postContentEdit.getText().toString(), postTitleEdit.getText().toString(), GlobalClass.selectedBlogSlug, client, new JsonHttpResponseHandler() {
+				@Override
+				public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+					AlertDialog.Builder builder = new AlertDialog.Builder(NewPostActivity.this);
+					builder.setTitle("Success").setMessage("You have successfully created new post").setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+
+							onBackPressed();
+						}
+					}).setCancelable(false).show();
+				}
+
+				@Override
+				public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+					super.onFailure(statusCode, headers, throwable, errorResponse);
+				}
+			});
+		}
 	}
 
 	private void createNewPost() throws UnsupportedEncodingException, JSONException {
